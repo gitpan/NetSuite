@@ -1,0 +1,84 @@
+NAME
+    NetSuite - A perl-based interface to the NetSuite SuiteTalk (Web
+    Services) API
+
+SYNOPSIS
+        use NetSuite;
+        use Data::Dumper;
+      
+    my $ns = NetSuite->new({
+            EMAIL => 'email@example.com',
+            PASSWORD => 'cpan4life',
+            ROLE => 3, # denotes and Administrator role
+            ACCOUNT => 12345678, # NetSuite account number
+        });
+        
+    $ns->login or die "Can't connect to NetSuite!";
+        $ns->get('customer', 1234);
+        print Dumper($ns->getResults);
+        $ns->logout;
+
+DESCRIPTION
+    NetSuite, Inc. is the leading provider of on-demand, integrated business
+    management software for growing and midsize businesses. NetSuite's
+    online products and professional services, companies are enabled to
+    manage all key business operations — in a single hosted system,
+    including: customer relationship management (CRM); order fulfillment;
+    inventory; accounting and finance, product assembly; ecommerce; Web site
+    management; and employee productivity.
+
+    Along with this integrated suite, NetSuite offers direct access your
+    company's database through a very complex web services in SOAP (Simple
+    Object Access Protocol). This module is designed to allow Perl
+    developers a way to quickly, easily, and efficiently communicate with
+    this service.
+
+    Please note that although this module greatly improves communication
+    with NetSuite, it assumes you have a very good understanding of SOAP
+    standards, and are capable of reading an understanding the WSDL (Web
+    Service Definition Language) file for the service.
+
+    For more information on SOAP or WSDL, visit:
+
+    <http://www.w3.org/TR/wsdl> <http://www.w3schools.com/wsdl/default.asp>
+    <http://www.w3.org/TR/soap/> <http://www.w3schools.com/soap/default.asp>
+
+TODO
+    There are several operations that are available through the web service
+    that I have not yet implemented. At Catalina Lifesciences, we have never
+    had a need for these components yet, but I have no problem implementing
+    them if there is a demand. Please don't hesitate to send me an e-mail.
+
+    addList updateList deleteList getList getAll getItemAvailability attach
+    / detach changePasswordOrEmail getDeleted initialize / initializeList
+
+    I also haven't delved into Asynchronous Request Processing, which would
+    allow you to submit multiple requests to NetSuite, check the status of
+    each request, and then once completed, receive the result(s). The
+    methods to support these type of calls include:
+
+    asyncAddList asyncUpdateList asyncDeleteList asyncGetList asyncSearch
+    asyncInitializeList
+
+    Again, if anyone finds themselves interested in these methods, let me
+    know and I can work toward implementing them. I currently have no plan
+    to.
+
+AUTHOR
+    Jonathan Lloyd, <mailto:webmaster@lifegames.org>
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2008, Jonathan Lloyd. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+ACKNOWLEDGEMENTS
+    The development and release of the NetSuite modules was made possible by
+    Catalina Lifesciences, Inc. (<http://www.catalinalifesciences.com>).
+
+    This module has been released after notifying NetSuite, Inc., and has a
+    test suite that is supported by a SuiteFlex Developer Account.
+
+    A special thanks to our NetSuite Account Manager, A.J. Gard.
+

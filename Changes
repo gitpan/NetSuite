@@ -1,0 +1,8 @@
+1.00 - Tue Feb  5 21:10:45 2008
+Inital module is complete.  Built in support for
+checking module dependencies in the Makefile.pl and
+required debugging modules at compile-time, 
+bsaed on directives passed into the constructor
+(i.e., DEBUG => 1) will now check for the existance
+of XML::Parser::PerlSAX and XML::Handler::YAWriter
+and croak if they are unavailable.
