@@ -9,17 +9,28 @@ NetSuite add Test
 This test attempts to add a customer record, and validates the returned
 internalId.
 
+=head1 REVISIONS
+
+Changed the customer hash reference because NetSuite altered their
+state enumeration values causing two of the four tests to fail.
+02/19/2008
+
+Updated the validation for the phone number field.  It is automatically
+formatted by NetSuite.  So when you add "650-627-1000" it returns as
+"(650) 627-1000".
+08/18/2008
+
 =cut
 
 use strict;
 #use warnings;
-use Test::More tests => 102;
+use Test::More tests => 98;
 use lib 'lib';
 
 BEGIN { use_ok( 'NetSuite' ); }
 require_ok( 'NetSuite' );
 
-my $ns = NetSuite->new({ DEFAULT => 1 });
+my $ns = NetSuite->new({ DEFAULT => 1, DEBUG => 1, LOGGINGDIR => '/home/netsuite' });
 isa_ok($ns, 'NetSuite');
 can_ok('NetSuite', qw(login get logout));
 
@@ -66,7 +77,7 @@ my $customer = {
             addr1 => '2955 Campus Drive',
             addr2 => 'Suite 100',
             city => 'San Mateo',
-            state => 'CA',
+            state => '_california',
             zip => '94403',
             country => '_unitedStates',
         },
@@ -79,7 +90,6 @@ my $customer = {
             addr1 => '1 Grenfell Road',
             addr2 => 'Maidenhead',
             city => 'Berks',
-            state => 'UK',
             zip => 'SL6 1HN',
             country => '_unitedKingdomGB',
         }
@@ -119,7 +129,7 @@ for my $field (keys %{ $customer }) {
                 elsif ($record eq 'ccNumber') {
                     $customer->{$field}->[$index]->{$record} =~ s/^\d+(\d\d\d\d)$/************$1/;
                 }
-                elsif ($record eq 'ccExpireDate') {
+                elsif ($record eq 'ccExpireDate' or $record eq 'state') {
                     delete $customer->{$field}->[$index]->{$record};
                 }
                 elsif ($customer->{$field}->[$index]->{$record} =~ /^\d+$/) {
@@ -135,8 +145,9 @@ for my $field (keys %{ $customer }) {
             $customer->{$field} = 'false' if $customer->{$field} == 0;
         }
         ok(defined $ns->getResults->{$field}, "$field exists");
-        is($ns->getResults->{$field}, $customer->{$field}, "$field defined");
-        
+        # phone numbers are formatted
+        if ($field eq 'phone') { is($ns->getResults->{$field}, '(650) 627-1000', "$field defined"); }
+        else { is($ns->getResults->{$field}, $customer->{$field}, "$field defined"); }
     }
 }
 
@@ -152,7 +163,8 @@ for my $address (@{ $ns->getResults->{addressbookList} }) {
         # validate each of the address fields for integrity
         for my $field (keys %{ $customer->{addressbookList}->[0] }) {
             ok(defined $address->{$field}, "$field exists");
-            is($address->{$field}, $customer->{addressbookList}->[0]->{$field}, "$field defined");
+            if ($field eq 'phone') { is($address->{$field}, '(650) 627-1000', "$field defined"); }
+            else { is($address->{$field}, $customer->{addressbookList}->[0]->{$field}, "$field defined"); }
         }
     }
     

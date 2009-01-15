@@ -1,22 +1,19 @@
 --- #YAML:1.0
 name:                NetSuite
-version:             1.00
+version:             1.03
 abstract:            A perl-based interface to the NetSuite SuiteTalk (Web Services) API
 license:             ~
-generated_by:        ExtUtils::MakeMaker version 6.36
+author:              
+    - Jonathan Lloyd <webmaster@lifegames.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
 distribution_type:   module
 requires:     
     Carp:                          0
     Data::Dumper:                  0
-    File::Util:                    0
     SOAP::Lite:                    0.69
     Test::More:                    0
-    XML::Handler::YAWriter:        0
     XML::Parser:                   0
     XML::Parser::EasyTree:         0
-    XML::Parser::PerlSAX:          0
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
-    version: 1.2
-author:
-    - Jonathan Lloyd <webmaster@lifegames.org>
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

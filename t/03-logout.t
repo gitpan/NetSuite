@@ -30,7 +30,7 @@ my $loginSuccessStatus = $ns->login;
 is($loginSuccessStatus, 1, 'successful login');
 
 my $logoutSuccessStatus = $ns->logout;
-is($logoutSuccessStatus, 1, 'succe$loginSuccessStatusssful logout');
+is($logoutSuccessStatus, 1, 'successsful logout');
 is ($ns->loginResults->{statusIsSuccess}, 'true', 'status parsing');
 
 # after successfully logging out of the session

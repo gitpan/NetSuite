@@ -33,6 +33,7 @@ my $entityId = 'NS' . time;
 # construct a very BASIC data structure to represent a customer
 my $customer = {
     entityId => $entityId,
+    isPerson => 0, # customer is NOT a person
     companyName => 'Module Installation',
     unsubscribe => 'true',
 };

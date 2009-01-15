@@ -7380,39 +7380,44 @@ sub SearchNamespaces {
 sub SystemNamespaces {
 
     return {
-        'general' => 'urn:general_2_6.transactions.webservices.netsuite.com',
-        'support' => 'urn:support_2_6.lists.webservices.netsuite.com',
+        'customersTypes' => 'urn:types.customers_2_6.transactions.webservices.netsuite.com',
         'website' => 'urn:website_2_6.lists.webservices.netsuite.com',
-        'core' => 'urn:core_2_6.platform.webservices.netsuite.com',
-        'employees' => 'urn:employees_2_6.lists.webservices.netsuite.com',
         'sales' => 'urn:sales_2_6.transactions.webservices.netsuite.com',
-        'relationships' => 'urn:relationships_2_6.lists.webservices.netsuite.com',
+        'purchasesTypes' => 'urn:types.purchases_2_6.transactions.webservices.netsuite.com',
         'purchases' => 'urn:purchases_2_6.transactions.webservices.netsuite.com',
-        'salesTypes' => 'urn:types.sales_2_6.transactions.webservices.netsuite.com',
-        'communicationTypes' => 'urn:types.communication_2_6.general.webservices.netsuite.com',
-        'marketingTypes' => 'urn:types.marketing_2_6.lists.webservices.netsuite.com',
         'employeesTypes' => 'urn:types.employees_2_6.lists.webservices.netsuite.com',
-        'customizationTypes' => 'urn:types.customization_2_6.setup.webservices.netsuite.com',
-        'inventoryTypes' => 'urn:types.inventory_2_6.transactions.webservices.netsuite.com',
         'schedulingTypes' => 'urn:types.scheduling_2_6.activities.webservices.netsuite.com',
-        'filecabinet' => 'urn:filecabinet_2_6.documents.webservices.netsuite.com',
-        'inventory' => 'urn:inventory_2_6.transactions.webservices.netsuite.com',
         'messages' => 'urn:messages_2_6.platform.webservices.netsuite.com',
         'scheduling' => 'urn:scheduling_2_6.activities.webservices.netsuite.com',
-        'websiteTypes' => 'urn:types.website_2_6.lists.webservices.netsuite.com',
-        'customization' => 'urn:customization_2_6.setup.webservices.netsuite.com',
-        'faults' => 'urn:faults_2_6.platform.webservices.netsuite.com',
-        'common' => 'urn:common_2_6.platform.webservices.netsuite.com',
-        'commonTypes' => 'urn:types.common_2_6.platform.webservices.netsuite.com',
-        'relationshipsTypes' => 'urn:types.relationships_2_6.lists.webservices.netsuite.com',
-        'supportTypes' => 'urn:types.support_2_6.lists.webservices.netsuite.com',
+        'coreTypes' => 'urn:types.core_2_6.platform.webservices.netsuite.com',
         'bank' => 'urn:bank_2_6.transactions.webservices.netsuite.com',
         'marketing' => 'urn:marketing_2_6.lists.webservices.netsuite.com',
         'filecabinetTypes' => 'urn:types.filecabinet_2_6.documents.webservices.netsuite.com',
         'customers' => 'urn:customers_2_6.transactions.webservices.netsuite.com',
-        'accounting' => 'urn:accounting_2_6.lists.webservices.netsuite.com',
         'accountingTypes' => 'urn:types.accounting_2_6.lists.webservices.netsuite.com',
+        'accounting' => 'urn:accounting_2_6.lists.webservices.netsuite.com',
+        'support' => 'urn:support_2_6.lists.webservices.netsuite.com',
+        'general' => 'urn:general_2_6.transactions.webservices.netsuite.com',
+        'core' => 'urn:core_2_6.platform.webservices.netsuite.com',
+        'employees' => 'urn:employees_2_6.lists.webservices.netsuite.com',
+        'relationships' => 'urn:relationships_2_6.lists.webservices.netsuite.com',
+        'communicationTypes' => 'urn:types.communication_2_6.general.webservices.netsuite.com',
+        'salesTypes' => 'urn:types.sales_2_6.transactions.webservices.netsuite.com',
+        'marketingTypes' => 'urn:types.marketing_2_6.lists.webservices.netsuite.com',
+        'inventoryTypes' => 'urn:types.inventory_2_6.transactions.webservices.netsuite.com',
+        'customizationTypes' => 'urn:types.customization_2_6.setup.webservices.netsuite.com',
+        'filecabinet' => 'urn:filecabinet_2_6.documents.webservices.netsuite.com',
+        'inventory' => 'urn:inventory_2_6.transactions.webservices.netsuite.com',
+        'websiteTypes' => 'urn:types.website_2_6.lists.webservices.netsuite.com',
+        'commonTypes' => 'urn:types.common_2_6.platform.webservices.netsuite.com',
+        'common' => 'urn:common_2_6.platform.webservices.netsuite.com',
+        'faults' => 'urn:faults_2_6.platform.webservices.netsuite.com',
+        'customization' => 'urn:customization_2_6.setup.webservices.netsuite.com',
+        'supportTypes' => 'urn:types.support_2_6.lists.webservices.netsuite.com',
+        'relationshipsTypes' => 'urn:types.relationships_2_6.lists.webservices.netsuite.com',
+        'bankTypes' => 'urn:types.bank_2_6.transactions.webservices.netsuite.com',
         'communication' => 'urn:communication_2_6.general.webservices.netsuite.com',
+        'faultsTypes' => 'urn:types.faults_2_6.platform.webservices.netsuite.com',
     };
 
 }
@@ -7741,202 +7746,3 @@ sub CountryEnumerations {
 
 }
 1;
-
-__END__
-
-=head1 NAME
-
-NetSuite::Config - Configuration variables for NetSuite.
-
-=head1 SYNOPSIS
-
-=head1 DESCRIPTION
-
-This module contains large hashes that are used when preparing communications
-with NetSuite.  It is constructed through a non-public perl script scraping
-the NetSuite WSDL file and producing specific information.
-
-This file will be updated as NetSuite rolls out new versions of SuiteTalk (web
-services).
-
-This information could also be useful when determining state and country
-enumerations.
-
-=head1 METHODS
-
-The methods within this module are used solely for reference when creating
-SOAP requests from within the NetSuite module.
-
-=head2 SearchTypes
-
-Returns a hash of hashes containing the various search types, the fields
-that can be used within each search, and the xsi:type of the field.
-
-    EntitySearchBasic => {
-        'address' => 'SearchStringField',
-        'city' => 'SearchStringField',
-        'country' => 'SearchEnumMultiSelectField',
-        'county' => 'SearchStringField',
-        'dateCreated' => 'SearchDateField',
-        'email' => 'SearchStringField',
-        'entityId' => 'SearchStringField',
-        'externalId' => 'SearchMultiSelectField',
-        'fax' => 'SearchStringField',
-        'giveAccess' => 'SearchBooleanField',
-        'image' => 'SearchStringField',
-        'internalId' => 'SearchMultiSelectField',
-        'isInactive' => 'SearchBooleanField',
-        'language' => 'SearchStringField',
-        'lastModifiedDate' => 'SearchDateField',
-        'phone' => 'SearchStringField',
-        'phoneticName' => 'SearchStringField',
-        'state' => 'SearchStringField',
-        'unsubscribe' => 'SearchBooleanField',
-        'zipCode' => 'SearchStringField',
-    },
-
-=head2 RecordTypes
-
-Returns a hash of hashes containing the various search types, the joined
-searches that can be performed, and their respective basic searches.
-
-    CalendarEventSearch => {
-        'basic' => 'CalendarEventSearchBasic',
-        'attendeeJoin' => 'EntitySearchBasic',
-        'attendeeContactJoin' => 'ContactSearchBasic',
-        'attendeeCustomerJoin' => 'CustomerSearchBasic',
-        'caseJoin' => 'SupportCaseSearchBasic',
-        'opportunityJoin' => 'OpportunitySearchBasic',
-        'transactionJoin' => 'TransactionSearchBasic',
-        'userNotesJoin' => 'NoteSearchBasic',
-    },
-
-=head2 RecordFields
-
-Returns a hash of hashes containing each record type or record list type, the
-fields within each record, and their respective xsi:type.
-
-    PhoneCall => {
-        'message' => 'scheduling:string',
-        'company' => 'core:RecordRef',
-        'contact' => 'core:RecordRef',
-        'supportCase' => 'core:RecordRef',
-        'transaction' => 'core:RecordRef',
-        'milestone' => 'core:RecordRef',
-        'customForm' => 'core:RecordRef',
-        'title' => 'scheduling:string',
-        'assigned' => 'core:RecordRef',
-        'sendEmail' => 'scheduling:boolean',
-        'startDate' => 'scheduling:dateTime',
-        'endDate' => 'scheduling:dateTime',
-        'timedEvent' => 'scheduling:boolean',
-        'completedDate' => 'scheduling:dateTime',
-        'phone' => 'scheduling:string',
-        'status' => 'schedulingTypes:PhoneCallStatus',
-        'priority' => 'schedulingTypes:PhoneCallPriority',
-        'accessLevel' => 'scheduling:boolean',
-        'reminderType' => 'schedulingTypes:PhoneCallReminderType',
-        'reminderMinutes' => 'schedulingTypes:PhoneCallReminderMinutes',
-        'createdDate' => 'scheduling:dateTime',
-        'lastModifiedDate' => 'scheduling:dateTime',
-        'contactList' => 'scheduling:PhoneCallContactList',
-        'customFieldList' => 'core:CustomFieldList',
-    },
-
-=head2 RecordNamespaces
-
-Returns a hash reference of different record types mapped to their respective
-namespace declarations.
-
-    return {
-        'calendarEvent' => 'scheduling',
-        'task' => 'scheduling',
-        'phoneCall' => 'scheduling',
-        'note' => 'communication',
-        'message' => 'communication',
-        'contact' => 'relationships',
-        'customer' => 'relationships',
-        ...
-    }
-
-=head2 SearchNamespaces
-
-Returns a hash reference of different search types mapped to their respectve
-namespace declarations.
-
-    return {
-        'CalendarEventSearch' => 'scheduling',
-        'TaskSearch' => 'scheduling',
-        'PhoneCallSearch' => 'scheduling',
-        'NoteSearch' => 'communication',
-        'MessageSearch' => 'communication',
-        'ContactSearch' => 'relationships',
-        'CustomerSearch' => 'relationships',
-        ...
-    }
-
-=head2 SystemNamespaces
-
-Returns a hash reference of namespace declarations and their respective mappings.
-
-    return {
-        'general' => 'urn:general_2_6.transactions.webservices.netsuite.com',
-        'support' => 'urn:support_2_6.lists.webservices.netsuite.com',
-        'website' => 'urn:website_2_6.lists.webservices.netsuite.com',
-        'core' => 'urn:core_2_6.platform.webservices.netsuite.com',
-        'employees' => 'urn:employees_2_6.lists.webservices.netsuite.com',
-        'sales' => 'urn:sales_2_6.transactions.webservices.netsuite.com',
-        'relationships' => 'urn:relationships_2_6.lists.webservices.netsuite.com',
-    }
-
-=head2 StateEnumerations
-
-Returns a hash reference of state enumerations and their respective values.
-
-    return {
-        'AL' => 'Alabama', 
-        'AK' => 'Alaska', 
-        'AB' => 'Alberta', 
-        'AR' => 'Arizona', 
-        'AZ' => 'Arkansas', 
-        'BC' => 'British Columbia', 
-        'CA' => 'California',
-        ...
-    }
-
-=head2 CountryEnumerations
-
-Returns a hash reference of country enumerations and their respective values.
-
-    return {
-        '_afghanistan' => 'Afghanistan', 
-        '_albania' => 'Albania', 
-        '_algeria' => 'Algeria', 
-        '_americanSamoa' => 'American Samoa', 
-        '_andorra' => 'Andorra', 
-        '_angola' => 'Angola', 
-        '_anguilla' => 'Anguilla', 
-    }
-    
-=head1 AUTHOR
-
-Jonathan Lloyd, L<mailto:webmaster@lifegames.org>
-
-=head1 LICENCE AND COPYRIGHT
-
-Copyright (c) 2008, Jonathan Lloyd. All rights reserved.
-
-This module is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself. See L<perlartistic>.
-
-=head1 ACKNOWLEDGEMENTS
-
-The development and release of the NetSuite modules was made possible by
-Catalina Lifesciences, Inc. (L<http://www.catalinalifesciences.com>).
-
-This module has been released after notifying NetSuite, Inc., and has a test
-suite that is supported by a SuiteFlex Developer Account.
-
-A special thanks to our NetSuite Account Manager, A.J. Gard.
-  
-=cut

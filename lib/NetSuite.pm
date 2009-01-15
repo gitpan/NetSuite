@@ -1,11 +1,11 @@
 package NetSuite;
-$VERSION = '1.00';
+$VERSION = '1.03';
 
 use strict;
 no warnings "all";
 
 use Carp;
-use SOAP::Lite 0.69;
+use SOAP::Lite;
 use Data::Dumper;
 use XML::Parser;
 use XML::Parser::EasyTree;
@@ -36,17 +36,20 @@ sub new {
         }
     }
     
-    if ($hash_ref->{ERRORDIR}) {
-        eval "require File::Util";
-        if ($@) {
-            croak "Unable to use ERRORDIR directive in constructor without File::Util loaded";
-        }
-        if (!-d $hash_ref->{ERRORDIR}) {
-          mkdir $hash_ref->{ERRORDIR}, 0777 or croak "Unable to create ERRORDIR directory $!";
+    for (qw(LOGGINGDIR ERRORDIR)) {
+        if (defined $hash_ref->{$_}) {
+            eval "require File::Util";
+            if ($@) {
+                croak "Unable to use $_ directive in constructor without File::Util loaded";
+            }
+            if (!-d $hash_ref->{$_}) {
+                mkdir $hash_ref->{$_}, 0777 or croak "Unable to create $_ directory $!";
+            }
         }
     }
     
     my $soap = SOAP::Lite->new;
+    #$soap->proxy('https://webservices.netsuite.com/services/NetSuitePort_2008_1');
     $soap->proxy('https://webservices.netsuite.com/services/NetSuitePort_2_6');
     
     my $systemNamespaces = &NetSuite::Config::SystemNamespaces;
@@ -118,7 +121,6 @@ sub login {
           } else { $self->error; }
         } else { $self->error; }
     }
-    
 }
 
 sub loginResults {
@@ -481,8 +483,10 @@ sub update {
     
     if ($som->fault) { $self->error; }
     else { 
-	if ($som->dataof("//updateResponse/writeResponse/status")->attr->{'isSuccess'} eq 'true') {
-          return $som->dataof("//updateResponse/writeResponse/baseRef")->attr->{'internalId'};
+        if ($som->match("//updateResponse/writeResponse/status")) {
+          if ($som->dataof("//updateResponse/writeResponse/status")->attr->{'isSuccess'} eq 'true') {
+              return $som->dataof("//updateResponse/writeResponse/baseRef")->attr->{'internalId'};
+          } else { $self->error; }
         } else { $self->error; }
     }
 
@@ -492,7 +496,7 @@ sub error {
     my ($self) = shift;
     
     my ($method) = ((caller(1))[3] =~ /^.*::(.*)$/);
-    
+   
     $self->{LAST_REQ} = $self->{SOAP}->transport->http_request->content();
     $self->{LAST_RES} = $self->{SOAP}->transport->http_response->content();
     
@@ -524,36 +528,8 @@ sub error {
         croak $errorMsg . 'Occured';
         
     }
-    
-    if ($self->{ERRORDIR}) {
-        
-        my $errorDir = $self->{ERRORDIR} . '/' . $method;
-        if (!-d $errorDir) {
-            mkdir $errorDir, 0777 or croak "Unable to create directory $errorDir";
-        }
-          
-        my $fileName = time;
-        my $xmlRequest = "$fileName-req.xml";
-        my $xmlResponse = "$fileName-res.xml";
-          
-        my $f = File::Util->new();
-        my $c = $f->write_file(
-            'file' => "$errorDir/$xmlRequest",
-            'content' => $self->{LAST_REQ},
-            'bitmask' => 0644
-        );
-          
-        if (!$c) { croak "Unable to create file $errorDir/$xmlRequest" }
-          
-        $f->write_file(
-            'file' => "$errorDir/$xmlResponse",
-            'content' => $self->{LAST_RES},
-            'bitmask' => 0644
-        );
-          
-        if (!$c) { croak "Unable to create file $errorDir/$xmlResponse" }
-          
-    }
+   
+    $self->_logTransport($self->{ERRORDIR}, $method) if $self->{ERRORDIR};
     return;
     
 }
@@ -578,23 +554,25 @@ sub _parseRequest {
           
           undef my @listElements;
           for my $listElement (@{ $requestRef->{$key} }) {
-              
+             
               undef my @sequence;
               # if the listElement is customField
               # handle it differently
               if ($listElementName eq 'customField') {
                 undef my $element;
+                $element->{name} = 'customField';
                 $element->{attr}->{internalId} = $listElement->{internalId};
                 $element->{attr}->{'xsi:type'} = $listElement->{type};
                 $element->{value} = \SOAP::Data->name('value')->value($listElement->{value});
-                push @sequence, SOAP::Data->new(%{ $element });
-                next;
+                push @listElements, SOAP::Data->new(%{ $element });
               }
+              else { 
               
-              while ( my ($key, $value) = each %{ $listElement } ) {
-                push @sequence, $self->_parseRequestField(ucfirst $requestType . ucfirst $listElementName, $key, $value);
+                  while ( my ($key, $value) = each %{ $listElement } ) {
+                    push @sequence, $self->_parseRequestField(ucfirst $requestType . ucfirst $listElementName, $key, $value);
+                  }
+                  push @listElements, SOAP::Data->name($listElementName => \SOAP::Data->value(@sequence));
               }
-              push @listElements, SOAP::Data->name($listElementName => \SOAP::Data->value(@sequence));
               
           }
           
@@ -627,6 +605,41 @@ sub _parseRequestField {
     
 }
 
+sub _logTransport {
+    my $self = shift;
+    my $path = shift;
+    my $method = shift;
+
+    my $dir = "$path/$method";
+    if (!-d $dir) {
+        mkdir $dir, 0777 or croak "Unable to create directory $dir";
+    }
+
+    my $fileName = time;
+    my $xmlRequest = "$fileName-req.xml";
+    my $xmlResponse = "$fileName-res.xml";
+
+    undef my $flag;
+    my $fh = File::Util->new();
+    $flag = $fh->write_file(
+        'file' => "$dir/$xmlRequest",
+        'content' => $self->{LAST_REQ},
+        'bitmask' => 0644
+    );
+
+    if (!$flag) { croak "Unable to create file $dir/$xmlRequest" }
+
+    $flag = $fh->write_file(
+        'file' => "$dir/$xmlResponse",
+        'content' => $self->{LAST_RES},
+        'bitmask' => 0644
+    );
+
+    if (!$flag) { croak "Unable to create file $dir/$xmlResponse" }
+    
+
+}
+
 sub _parseResponse {
     my ($self) = shift;
     
@@ -635,6 +648,8 @@ sub _parseResponse {
     
     $self->{LAST_REQ} = $self->{SOAP}->transport->http_request->content();
     $self->{LAST_RES} = $self->{SOAP}->transport->http_response->content();
+
+    $self->_logTransport($self->{LOGGINGDIR}, $method) if $self->{LOGGINGDIR};
 
     my $p = new XML::Parser( Style=>'EasyTree' );
     my $tree = $p->parse($self->{LAST_RES});
@@ -648,7 +663,7 @@ sub _parseResponse {
     $self->{TIME} = time;
     $self->{LAST_HEAD} = $head;
     $self->{LAST_BODY} = $body;
-    
+
     if ($method eq 'error') {
 
         # if the error is NOT being produced by the login function, the
@@ -656,7 +671,7 @@ sub _parseResponse {
         if (ref $body->{content}->[0]->{content}->[0]->{content}->[0]->{content} eq 'ARRAY') {
           return &_parseFamily($body->{content}->[0]->{content}->[0]->{content}->[0]->{content});
         }
-        elsif ($body->{content}->[0]->{content}->[2]->{content}->[0]->{content}->[0]->{name} eq 'ns1:code') {
+        elsif ($body->{content}->[0]->{content}->[2]->{content}->[0]->{content}->[0]->{name} =~ m/ns1:code/) {
           return &_parseFamily($body->{content}->[0]->{content}->[2]->{content}->[0]->{content});
         }
         elsif ($body->{content}->[0]->{content}->[2]->{content}->[0]->{name} eq 'ns1:hostname') {
@@ -694,15 +709,15 @@ sub _parseFamily {
                     if ($node->{name} =~ /List$/) {
               if (scalar @{ $node->{content}->[0]->{content} } > 1) {
                 for (0..scalar @{ $node->{content} }-1) {
-                    push @{ $parse_ref->{$node->{name}} }, &_parseFamily($node->{content}->[$_]->{content});
+                    push @{ $parse_ref->{$node->{name}} }, &_parseFamily($node->{content}->[0]->{content});
                 }
               }
               else {
-                if (!ref $node->{content}->[$_]->{content}->[0]->{content}) {
-                    $parse_ref = &_parseNode($node->{content}->[$_], $parse_ref);
+                if (!ref $node->{content}->[0]->{content}->[0]->{content}) {
+                    $parse_ref = &_parseNode($node->{content}->[0], $parse_ref);
                 }
                 else {
-                    push @{ $parse_ref->{$node->{name}} }, &_parseNode($node->{content}->[$_]->{content}->[0]);
+                    push @{ $parse_ref->{$node->{name}} }, &_parseNode($node->{content}->[0]->{content}->[0]);
                 }
               }
                     }
@@ -718,30 +733,30 @@ sub _parseFamily {
               if ($node->{name} =~ /(List|Matrix)$/) {
                 if (scalar @{ $node->{content}->[0]->{content} } > 1) {
                     for (0..scalar @{ $node->{content} }-1) {
-              my $record = &_parseFamily($node->{content}->[$_]->{content});
-              $record = &_parseAttributes($node->{content}->[$_], $record);
-              push @{ $parse_ref->{$node->{name}} }, $record;
+                        my $record = &_parseFamily($node->{content}->[$_]->{content});
+                        $record = &_parseAttributes($node->{content}->[$_], $record);
+                        push @{ $parse_ref->{$node->{name}} }, $record;
                     }
                 }
                 else {
                     for (0..scalar @{ $node->{content} }-1) {
-              if (!ref $node->{content}->[$_]->{content}->[0]->{content}) {
-                $parse_ref = &_parseNode($node->{content}->[$_], $parse_ref);
-              }
-              else {
-                #if ($node->{name} eq 'customFieldList') {
-                #    push @{ $parse_ref->{$node->{name}} }, &_parseNode($node->{content}->[$_]);
-                #}
-                if (!ref $node->{content}->[$_]->{content}->[0]->{content}->[0]->{content}) {
-                    push @{ $parse_ref->{$node->{name}} }, &_parseNode($node->{content}->[$_]);
-                }
-                elsif (ref $node->{content}->[$_]->{content}->[0]->{content}->[0]->{content}) {
-                    push @{ $parse_ref->{$node->{name}} }, &_parseNode($node->{content}->[$_]->{content}->[0]);
-                }
-                else {
-                    push @{ $parse_ref->{$node->{name}} }, &_parseNode($node->{content}->[$_]);
-                }
-              }
+                        if (!ref $node->{content}->[$_]->{content}->[0]->{content}) {
+                            $parse_ref = &_parseNode($node->{content}->[$_], $parse_ref);
+                        }
+                        else {
+                            #if ($node->{name} eq 'customFieldList') {
+                            #    push @{ $parse_ref->{$node->{name}} }, &_parseNode($node->{content}->[$_]);
+                            #}
+                            if (!ref $node->{content}->[$_]->{content}->[0]->{content}->[0]->{content}) {
+                                push @{ $parse_ref->{$node->{name}} }, &_parseNode($node->{content}->[$_]);
+                            }
+                            elsif (ref $node->{content}->[$_]->{content}->[0]->{content}->[0]->{content}) {
+                                push @{ $parse_ref->{$node->{name}} }, &_parseNode($node->{content}->[$_]->{content}->[0]);
+                            }
+                            else {
+                                push @{ $parse_ref->{$node->{name}} }, &_parseNode($node->{content}->[$_]);
+                            }
+                        }
                     }
                 }
               }
@@ -801,7 +816,12 @@ sub _parseNode {
         # if the name of the inner attribute is "name", then only worry about the value
         if (defined $hash_ref->{content}->[0]->{name}) {
           $hash_ref->{content}->[0]->{name} =~ /^(.*:)?(name|value)$/;
-          $parse_ref->{$hash_ref->{name} . ucfirst($2)} = $hash_ref->{content}->[0]->{content}->[0]->{content};
+          if (defined $hash_ref->{content}->[0]->{attrib}->{internalId}) {
+              $parse_ref->{$hash_ref->{name} . ucfirst($2)} = $hash_ref->{content}->[0]->{attrib}->{internalId};
+          }
+          else {
+              $parse_ref->{$hash_ref->{name} . ucfirst($2)} = $hash_ref->{content}->[0]->{content}->[0]->{content};
+          }
         }
         else {
           if (defined $hash_ref->{content}->[0]->{content}) {

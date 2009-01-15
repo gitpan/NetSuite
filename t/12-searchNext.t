@@ -18,7 +18,7 @@ use lib 'lib';
 
 BEGIN { use_ok( 'NetSuite' ); }
 require_ok( 'NetSuite' );
-require_ok( 't/subs.pl' );
+require_ok( '/home/netsuite/t/subs.pl' );
 
 my $ns = NetSuite->new({ DEFAULT => 1 });
 isa_ok($ns, 'NetSuite');

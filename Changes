@@ -1,3 +1,70 @@
+TODO: 
+
+When doing a search where no search value should be defined,
+a blank value is being inserted causing the query to fail.
+The bad query and the corrected query are below.  The module
+should be updated to not force a searchValue is the value
+field in the hash reference doesn't exist.
+
+# BAD (should work)
+my $query = {
+    basic => [
+        { name => 'customFieldList', value => [
+                {
+                    name => 'customField',
+                    attr => {
+                          operator => 'notEmpty',
+                        internalId => 'custentity30',
+                        'xsi:type' => 'core:SearchStringCustomField'
+                    },
+                },
+            ],
+        },
+    ],
+};
+
+# GOOD (shouldn't have to do this)
+my $query = {
+    basic => [
+        { name => 'customFieldList', value => [
+                {
+                    name => 'customField',
+                    attr => {
+                          operator => 'contains',
+                        internalId => 'custentity30',
+                        'xsi:type' => 'core:SearchStringCustomField'
+                    },
+                    value => '@'
+                },
+            ],
+        },
+    ],
+};
+
+1.03 - Mon Aug 18 21:09:08 2008
+Updated the NetSuite module to officially support version 2008.1.
+Made modifications to the _parseResponse routine to correct a bug 
+(thanks Eric Rybski). Uncommented a piece of logic to validate a 
+correct search type.  Updated the Config.pl - a script to generate 
+a new Config.pm from the current NetSuite WSDL file.  It now has 
+documentation, debugging, and could be released with the final product.
+Allowed the module to run any version of SOAP::Lite.
+
+1.02 - Mon Jun 30 12:34:00 2008
+Quickly upated the Config.pl to pull from the new NetSuite WSDL
+file.  Produced a new Config.pm and updated the NetSuite module
+to pull from the new endpoint.
+
+It passed the test suite, but didn't do any thorough testing.
+
+1.01 - Tue Feb 19 09:19:39 2008 
+Adjusted the logic in the _parseNode routine
+to correct an issue with parsing custom fields.
+If there was a customField whos value was an 
+internalId it was not returning it.
+TODO: Allow the TYPE of custom field to also
+be returned in the result set.
+
 1.00 - Tue Feb  5 21:10:45 2008
 Inital module is complete.  Built in support for
 checking module dependencies in the Makefile.pl and

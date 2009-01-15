@@ -1,5 +1,7 @@
 lib/NetSuite.pm
 lib/NetSuite/Config.pm
+lib/NetSuite/Config.pl
+lib/NetSuite/Config.tmpl
 Makefile.PL
 MANIFEST			This list of files
 README
